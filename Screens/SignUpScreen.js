@@ -16,7 +16,6 @@ import {
 } from 'react-native-responsive-screen';
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../context/authContext';
-import {resolver} from '../metro.config';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();

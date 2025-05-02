@@ -1,18 +1,24 @@
 import {View, StyleSheet, Text, Image, TextInput, FlatList} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import TrendingCards from '../component/TrendingCards';
 import SearchBar from '../component/SearchBar';
 import {useNavigation} from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
-import useFetch from '../services/api';
 import MovieCard from '../component/MovieCard';
+import {useLatestMovies} from '../services/api';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const handlePress = () => {
     navigation.navigate('Search');
   };
-  const {movies, loading, error} = useFetch('');
+
+  const {movies, loading, fetchLatestMovies} = useLatestMovies();
+
+  useEffect(() => {
+    fetchLatestMovies();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.secondContainer}>
