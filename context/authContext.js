@@ -97,17 +97,41 @@ export function AuthProvider({children}) {
           rating: vote_average,
           searchDate: firestore.FieldValue.serverTimestamp(),
         });
-        console.log('User search history created successfully');
+        console.log('user search history created successfully');
       }
 
-      return {userSearchHistory: true};
+      return {usersearchhistory: true};
     } catch (e) {
-      console.log('Error while fetching user search history:', e);
+      console.log('error while fetching user search history:', e);
       return {
-        userSearchHistory: false,
-        msg: e.message || 'An unknown error occurred',
+        usersearchhistory: false,
+        msg: e.message || 'an unknown error occurred',
       };
     }
+  };
+
+  const getusersearch = async uid => {
+    try {
+      const trendingSearchRef = firestore()
+        .collection('Users')
+        .doc(uid)
+        .collection('searchHistory');
+
+      const querySnapshot = await trendingSearchRef
+        .orderBy('count', 'desc')
+        .limit(5)
+        .get();
+
+      const searchHistory = [];
+      querySnapshot.forEach(documentSnapshot => {
+        console.log('User ID:', documentSnapshot.id, documentSnapshot.data());
+        searchHistory.push({
+          id: documentSnapshot.id,
+          ...documentSnapshot.data(),
+        });
+      });
+      return searchHistory;
+    } catch (e) {}
   };
 
   const login = async (email, password) => {
@@ -138,6 +162,7 @@ export function AuthProvider({children}) {
         logout,
         login,
         setUserSearch,
+        getusersearch,
       }}>
       {children}
     </AuthContext.Provider>

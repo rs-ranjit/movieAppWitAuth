@@ -22,14 +22,11 @@ const SearchScreen = () => {
     return () => clearTimeout(timeout);
   }, [movie]);
 
-  console.log(debouncedMovie);
-
   useEffect(() => {
     if (debouncedMovie) {
       searchMovies(debouncedMovie);
     }
   }, [debouncedMovie]);
-  console.log(movies);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
