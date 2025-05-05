@@ -1,13 +1,23 @@
-import {View, StyleSheet, Text, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from 'react-native';
 import React from 'react';
 
-const TrendingCard = ({url, name}) => {
+const width = Dimensions.get('window').width;
+
+const TrendingCards = ({url, name}) => {
+  console.log('This is trending', url);
   return (
     <View
       style={{
-        flex: 1,
-        maxWidth: 120,
-        padding: 10,
+        gap: 20,
+        width: width / 3 - 20,
+        padding: 20,
       }}>
       <TouchableOpacity>
         <Image
@@ -24,11 +34,11 @@ const TrendingCard = ({url, name}) => {
   );
 };
 
-export default TrendingCard;
+export default TrendingCards;
 
 const styles = StyleSheet.create({
   image: {
-    width: '90%',
+    width: '100%',
     height: 140,
     borderRadius: 10,
   },

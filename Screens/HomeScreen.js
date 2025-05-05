@@ -1,14 +1,32 @@
-import {View, StyleSheet, Text, Image, TextInput, FlatList} from 'react-native';
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  TextInput,
+  FlatList,
+  ScrollView,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import TrendingCards from '../component/TrendingCards';
 import SearchBar from '../component/SearchBar';
 import {useNavigation} from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
 import MovieCard from '../component/MovieCard';
 import {useLatestMovies} from '../services/api';
+import {useAuth} from '../context/authContext';
+import auth from '@react-native-firebase/auth';
+import Carousel from 'react-native-reanimated-carousel';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const {getusersearch} = useAuth();
+  const [hist, setHist] = useState([]);
+  const [Loading, setLoading] = useState(false);
+
+  const uid = auth().currentUser?.uid;
+  console.log(uid);
+
   const handlePress = () => {
     navigation.navigate('Search');
   };
@@ -19,6 +37,19 @@ const HomeScreen = () => {
     fetchLatestMovies();
   }, []);
 
+  useEffect(() => {
+    if (uid) {
+      setLoading(true);
+      const fetchSearchHist = async () => {
+        const history = await getusersearch(uid);
+        setHist(history);
+        setLoading(false);
+      };
+      fetchSearchHist();
+    }
+  }, [uid]);
+  console.log('This is hist name', hist[0]?.url);
+
   return (
     <View style={styles.container}>
       <View style={styles.secondContainer}>
@@ -26,11 +57,8 @@ const HomeScreen = () => {
         <SearchBar onPress={handlePress} placeholder="Search for movies." />
         <View style={styles.TrendingContainer}>
           <Text style={[styles.text]}>Trending Movies</Text>
-        </View>
-        <View style={styles.latestContainer}>
-          <Text style={[styles.text]}>Latest Movies</Text>
-          <View style={{flexDirection: 'row'}}>
-            {loading ? (
+          <View>
+            {Loading ? (
               <View style={styles.loaderContainer}>
                 <LottieView
                   source={require('../assets/loading.json')}
@@ -40,22 +68,49 @@ const HomeScreen = () => {
                 />
               </View>
             ) : (
-              <FlatList
-                data={movies}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => (
-                  <MovieCard
-                    name={item.title}
-                    url={item.poster_path}
-                    rating={item.vote_average}
-                  />
-                )}
-                showsVerticalScrollIndicator={false}
-                columnWrapperStyle={{justifyContent: 'flex-start', gap: 20}}
-                numColumns={3}
-              />
+              <View>
+                <FlatList
+                  data={hist}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item}) => (
+                    <TrendingCards url={item.url} name={item.movieTitle} />
+                  )}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{paddingHorizontal: 10}}
+                  style={{height: 200}}
+                />
+              </View>
             )}
           </View>
+        </View>
+        <View style={styles.latestContainer}>
+          <Text style={[styles.text]}>Latest Movies</Text>
+          {loading ? (
+            <View style={styles.loaderContainer}>
+              <LottieView
+                source={require('../assets/loading.json')}
+                autoPlay
+                loop
+                style={styles.lottie}
+              />
+            </View>
+          ) : (
+            <FlatList
+              data={movies}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => (
+                <MovieCard
+                  name={item.title}
+                  url={item.poster_path}
+                  rating={item.vote_average}
+                />
+              )}
+              showsVerticalScrollIndicator={false}
+              columnWrapperStyle={{justifyContent: 'flex-start', gap: 20}}
+              numColumns={3}
+            />
+          )}
         </View>
       </View>
     </View>
@@ -74,7 +129,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     flex: 1,
   },
-  secondContainer: {flex: 1, alignItems: 'center'},
+  secondContainer: {
+    alignItems: 'center',
+  },
   image: {
     width: 50,
     height: 50,
@@ -84,9 +141,7 @@ const styles = StyleSheet.create({
   TrendingContainer: {
     width: '90%',
     marginLeft: 10,
-    marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    marginBottom: 10,
   },
   latestContainer: {
     width: '90%',

@@ -111,6 +111,8 @@ export function AuthProvider({children}) {
   };
 
   const getusersearch = async uid => {
+    const searchHistory = [];
+
     try {
       const trendingSearchRef = firestore()
         .collection('Users')
@@ -122,16 +124,23 @@ export function AuthProvider({children}) {
         .limit(5)
         .get();
 
-      const searchHistory = [];
       querySnapshot.forEach(documentSnapshot => {
-        console.log('User ID:', documentSnapshot.id, documentSnapshot.data());
         searchHistory.push({
           id: documentSnapshot.id,
           ...documentSnapshot.data(),
         });
       });
-      return searchHistory;
-    } catch (e) {}
+
+      if (searchHistory.length === 0) {
+        console.log('No search history found');
+      } else {
+        console.log('Search History:', searchHistory);
+      }
+    } catch (e) {
+      console.error('Error fetching search history:', e);
+      return [];
+    }
+    return searchHistory;
   };
 
   const login = async (email, password) => {
