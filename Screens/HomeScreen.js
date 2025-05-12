@@ -1,12 +1,4 @@
-import {
-  View,
-  StyleSheet,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  ScrollView,
-} from 'react-native';
+import {View, StyleSheet, Text, Image, FlatList} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import TrendingCards from '../component/TrendingCards';
 import SearchBar from '../component/SearchBar';
@@ -16,25 +8,28 @@ import MovieCard from '../component/MovieCard';
 import {useLatestMovies} from '../services/api';
 import {useAuth} from '../context/authContext';
 import auth from '@react-native-firebase/auth';
-import Carousel from 'react-native-reanimated-carousel';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const {getusersearch} = useAuth();
   const [hist, setHist] = useState([]);
   const [Loading, setLoading] = useState(false);
+  const [newTrend, setNewTrend] = useState([]);
 
   const uid = auth().currentUser?.uid;
-  console.log(uid);
 
   const handlePress = () => {
     navigation.navigate('Search');
+  };
+  const handleTrendingPress = items => {
+    navigation.navigate('Detail', {items});
   };
 
   const {movies, loading, fetchLatestMovies} = useLatestMovies();
 
   useEffect(() => {
     fetchLatestMovies();
+    setNewTrend(movies);
   }, []);
 
   useEffect(() => {
@@ -47,8 +42,47 @@ const HomeScreen = () => {
       };
       fetchSearchHist();
     }
-  }, [uid]);
-  console.log('This is hist name', hist[0]?.url);
+  }, []);
+
+  const handleTrending = () => {
+    if (hist.length > 3) {
+      return (
+        <View>
+          <FlatList
+            data={hist}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => (
+              <TrendingCards
+                url={item.url}
+                name={item.movieTitle}
+                onPress={() => handleTrendingPress(item)}
+              />
+            )}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: 10}}
+            style={{height: 200}}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View style={{borderRadius: 80}}>
+          <FlatList
+            data={newTrend}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => (
+              <TrendingCards url={item.poster_path} name={item.title} />
+            )}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: 10}}
+            style={{height: 200}}
+          />
+        </View>
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -68,19 +102,7 @@ const HomeScreen = () => {
                 />
               </View>
             ) : (
-              <View>
-                <FlatList
-                  data={hist}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item}) => (
-                    <TrendingCards url={item.url} name={item.movieTitle} />
-                  )}
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{paddingHorizontal: 10}}
-                  style={{height: 200}}
-                />
-              </View>
+              handleTrending()
             )}
           </View>
         </View>
@@ -104,6 +126,7 @@ const HomeScreen = () => {
                   name={item.title}
                   url={item.poster_path}
                   rating={item.vote_average}
+                  onPress={() => handleTrendingPress(item)}
                 />
               )}
               showsVerticalScrollIndicator={false}
@@ -141,12 +164,18 @@ const styles = StyleSheet.create({
   TrendingContainer: {
     width: '90%',
     marginLeft: 10,
-    marginBottom: 10,
+    marginBottom: 20,
+    padding: 5,
+    gap: 10,
+    borderBottomColor: 'white',
+    borderBottomWidth: 1,
   },
   latestContainer: {
     width: '90%',
     marginLeft: 10,
     marginBottom: 20,
+    borderTopColor: 'white',
+    borderTopWidth: 1,
   },
   loaderContainer: {
     flex: 1,

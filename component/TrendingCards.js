@@ -8,18 +8,16 @@ import {
 } from 'react-native';
 import React from 'react';
 
-const width = Dimensions.get('window').width;
+const {width, height} = Dimensions.get('window');
 
-const TrendingCards = ({url, name}) => {
-  console.log('This is trending', url);
+const TrendingCards = ({url, name, onPress}) => {
   return (
     <View
       style={{
-        gap: 20,
         width: width / 3 - 20,
-        padding: 20,
+        marginRight: 20,
       }}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onPress}>
         <Image
           source={{uri: `https://image.tmdb.org/t/p/w500${url}`}}
           style={styles.image}
@@ -38,8 +36,9 @@ export default TrendingCards;
 
 const styles = StyleSheet.create({
   image: {
-    width: '100%',
-    height: 140,
+    width: width / 3 - 20,
+    height: height * 0.2,
     borderRadius: 10,
+    resizeMode: 'contain',
   },
 });

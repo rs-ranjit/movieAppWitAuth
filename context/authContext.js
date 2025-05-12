@@ -79,7 +79,6 @@ export function AuthProvider({children}) {
         .collection('searchHistory')
         .doc(id);
 
-      console.log('This is id 1', id);
       const docSnapshot = await userSearchRef.get();
 
       // If the document doesn't exist, create it; otherwise, update the existing one

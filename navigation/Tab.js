@@ -4,9 +4,23 @@ import HomeScreen from '../Screens/HomeScreen';
 import SearchScreen from '../Screens/SearchScreen';
 import SavedScreen from '../Screens/SavedScreen';
 import ProfileScreen from '../Screens/ProfileScreen';
+import DetailScreen from '../Screens/DetailScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Detail" component={DetailScreen} />
+    </Stack.Navigator>
+  );
+};
 
 const TabNavigation = () => {
   return (
@@ -20,7 +34,7 @@ const TabNavigation = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStack}
         options={{
           tabBarIcon: ({color, size}) => (
             <Ionicons name="home" size={size} color={color} />

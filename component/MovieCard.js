@@ -2,7 +2,7 @@ import {View, StyleSheet, Text, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const MovieCard = ({url, name, rating}) => {
+const MovieCard = ({url, name, rating, onPress}) => {
   return (
     <View
       style={{
@@ -10,7 +10,7 @@ const MovieCard = ({url, name, rating}) => {
         maxWidth: 100,
         padding: 10,
       }}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onPress}>
         <Image
           source={{uri: `https://image.tmdb.org/t/p/w500${url}`}}
           style={styles.image}
